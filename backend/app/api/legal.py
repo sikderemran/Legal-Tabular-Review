@@ -1,6 +1,6 @@
-from fastapi import APIRouter, UploadFile, File
+from fastapi import APIRouter, UploadFile, File, Body
 from app.models.schemas import (
-    DocumentInfo,
+    DocumentInfo, CompareRequest,
     UploadResponse, DocumentType
 )
 from typing import List
@@ -118,6 +118,18 @@ async def get_document(document_id: str):
     
     doc = documents_store[document_id]
     return doc.dict()
+
+@router.post("/api/compare")
+async def compare_documents(request: CompareRequest):
+    results = []
+    for doc_id in request.document_ids:
+        if doc_id not in documents_store:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Document {doc_id} not found"
+            )
+        results.append(documents_store[doc_id])
+    return results
 
 @router.post("/api/documents/{document_id}/extract")
 async def extract_document_fields(document_id: str):

@@ -4,12 +4,14 @@ import { useState, useEffect } from 'react'
 import { FileText, CheckCircle, XCircle, Clock, Download } from 'lucide-react'
 import { api } from '../../app/api/client'
 import toast from 'react-hot-toast'
+import { useRouter } from "next/navigation";
 
 export default function DocumentList() {
     const [documents, setDocuments] = useState([])
     const [loading, setLoading] = useState(true)
     const [selectedDocs, setSelectedDocs] = useState(new Set())
     const [extracting, setExtracting] = useState(null)
+    const router = useRouter();
 
     useEffect(() => {
         loadDocuments()
@@ -60,9 +62,9 @@ export default function DocumentList() {
 
         try {
             const docIds = Array.from(selectedDocs)
-            const result = await api.compareDocuments(docIds)
+            const query = `?docIds=${encodeURIComponent(JSON.stringify(docIds))}`
+            router.push(`/compare${query}`)
 
-            window.location.href = `/compare/${result.comparison_id}`
         } catch (error) {
             console.error('Error comparing:', error)
             toast.error('Failed to compare documents')
@@ -124,7 +126,7 @@ export default function DocumentList() {
                         </div>
                         <button
                             onClick={handleCompare}
-                            className="btn btn-primary"
+                            className="btn btn-primary px-3 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
                         >
                             Compare Selected
                         </button>

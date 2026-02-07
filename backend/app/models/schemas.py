@@ -78,3 +78,5 @@ class UploadResponse(BaseModel):
     files: List[DocumentInfo]
     total_size: int
 
+class CompareRequest(BaseModel):
+    document_ids: list[str]
